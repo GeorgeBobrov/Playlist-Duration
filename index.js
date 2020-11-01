@@ -8,19 +8,19 @@ var pSelectorsOld = {
   containerOuter: '#pl-header',
   videoTime : '.timestamp span',
   loadMore  : '.load-more-button',
-  load      : 'playlistTime_load'
+  load      : 'playlistDur_load'
 }
 
 // Selectors for new (Polymer) interface
 var pSelectorsPolymer = {
   containerOuter: '#items > ytd-playlist-sidebar-primary-info-renderer',
   videoTime : 'ytd-thumbnail-overlay-time-status-renderer > span',
-  loadMore  : '.load-more-button',
-  load      : 'playlistTime_load'
+  loadMore  : null,
+  load      : null
 }
 
-var playlistTime = 'playlistTime_inner';
-var playlistTimeText  = '.playlistTime_inner span';
+var playlistDur = 'playlistDur';
+var playlistDurText  = '.playlistDur span';
 
 var parser = new DOMParser();
 var newInterface = document.querySelector(pSelectorsPolymer.containerOuter);
@@ -38,9 +38,9 @@ container.appendChild(createElement());
 function createElement(){
   var div = document.createElement('div');
   console.log(pSelectors);
-  div.classList.add(playlistTime);
+  div.classList.add(playlistDur);
   if (newInterface)  
-   div.classList.add('new');
+   div.classList.add('polymer');
 
   var img = document.createElement('img');
   img.src = imgURL;
@@ -58,12 +58,12 @@ function createElement(){
 
 function gelAllPlaylist(){
   videosCollection = document.querySelectorAll(pSelectors.videoTime);
-  timeSeconds = calcTime(videosCollection);
+  timeSeconds = calcTotalDuration(videosCollection);
   var moreButton = document.querySelector(pSelectors.loadMore);
   if(moreButton){
     getJSON(moreButton.dataset.uixLoadMoreHref);
     var doc = parser.parseFromString(videosCollection, "text/html")
-    timeSeconds += calcTime(doc.querySelectorAll(pSelectors.videoTime));
+    timeSeconds += calcTotalDuration(doc.querySelectorAll(pSelectors.videoTime));
   } else{
     return convertSeconds(timeSeconds, videosCollection.length);
   }
@@ -80,21 +80,21 @@ function getJSON(url) {
     if (status == 200) {
       var data = xhr.response;
       var doc = parser.parseFromString(data.content_html, "text/html")
-      timeSeconds += calcTime(doc.querySelectorAll(pSelectors.videoTime));
+      timeSeconds += calcTotalDuration(doc.querySelectorAll(pSelectors.videoTime));
       if(data.load_more_widget_html){
         var more = parser.parseFromString(data.load_more_widget_html, "text/html");
         getJSON(more.querySelector(pSelectors.loadMore).dataset.uixLoadMoreHref);
       } else {
-        document.querySelector(playlistTimeText).innerHTML = convertSeconds(timeSeconds, videosCollection.length);
+        document.querySelector(playlistDurText).innerHTML = convertSeconds(timeSeconds, videosCollection.length);
       }
     } else {
-      document.querySelector(playlistTimeText).innerHTML = '--:--:--';
+      document.querySelector(playlistDurText).innerHTML = '--:--:--';
     }
   };
   xhr.send(timeSeconds);
 };
 
-function calcTime(timeList){
+function calcTotalDuration(timeList){
   var time = [].slice.call(timeList).reduce(function(a, el){
     return a + el.innerHTML.split(':').reverse().map(function(a,i){
       return [1,60,3600][i]*a;
@@ -114,7 +114,7 @@ function convertSeconds(num, countOfVideos){
   let hour = num % 24;
   let day = Math.trunc(num / 24); 
 
-  let result = 'Length of ' + countOfVideos + ': &nbsp;&nbsp;';
+  let result = 'Duration of ' + countOfVideos + ': &nbsp;&nbsp;';
   if (day > 0) 
     result = result + day + 'd ';
   if ((day > 0) || (hour > 0))
