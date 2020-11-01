@@ -5,25 +5,27 @@ var videosCollection,
 
 // Selectors for old interface
 var pSelectorsOld = {
-  containerOuter: '#pl-header',
-  videoTime : '.timestamp span',
-  loadMore  : '.load-more-button',
-  load      : 'playlistDur_load'
+  containerToPlace: '#pl-header',
+  videoTime : 'tbody#pl-load-more-destination',
+  videoTimeSpan: '.timestamp > span',  
+  playlistConteiner: '#browse-items-primary',
+  videoConteiner: 'TR'
 }
 
 // Selectors for new (Polymer) interface
 var pSelectorsPolymer = {
-  containerOuter: '#items > ytd-playlist-sidebar-primary-info-renderer',
-  videoTime : 'ytd-thumbnail-overlay-time-status-renderer > span',
-  loadMore  : null,
-  load      : null
+  containerToPlace: '#items > ytd-playlist-sidebar-primary-info-renderer',
+  videoTime : 'ytd-thumbnail-overlay-time-status-renderer',
+  videoTimeSpan: 'ytd-thumbnail-overlay-time-status-renderer > span',
+  playlistConteiner: 'ytd-playlist-video-list-renderer',
+  videoConteiner: 'ytd-playlist-video-renderer'
 }
 
 var playlistDur = 'playlistDur';
 var playlistDurText  = '.playlistDur span';
 
 var parser = new DOMParser();
-var newInterface = document.querySelector(pSelectorsPolymer.containerOuter);
+var newInterface = document.querySelector(pSelectorsPolymer.containerToPlace);
 
 var pSelectors;
 if (newInterface)
@@ -31,11 +33,49 @@ if (newInterface)
 else
   pSelectors = pSelectorsOld;
 
-var container = document.querySelector(pSelectors.containerOuter);  
+var containerToPlace = document.querySelector(pSelectors.containerToPlace);  
+containerToPlace.appendChild(createPlaylistDurElement());
 
-container.appendChild(createElement());
 
-function createElement(){
+var playlistConteiner = document.querySelector(pSelectors.playlistConteiner)
+
+let observer = new MutationObserver(mutationRecords => {
+  // console.log(mutationRecords);
+
+  for (const mutationRecord of mutationRecords) {
+    // console.log(mutationRecord.target);
+    // if (mutationRecord.removedNodes.length > 0)
+    //   console.log(mutationRecord.removedNodes[0].nodeName);
+
+    if (mutationRecord.type == "childList")
+    if (mutationRecord.target.matches(pSelectors.videoTime) 
+    ||
+      (
+        (mutationRecord.removedNodes.length > 0) && 
+        (mutationRecord.removedNodes[0].nodeName == pSelectors.videoConteiner.toUpperCase()))
+      )
+        document.querySelector(playlistDurText).innerHTML = getPlaylistDuration();
+  }
+});
+
+observer.observe(playlistConteiner, {
+  childList: true, 
+  subtree: true,
+  characterData: true
+});  
+
+// let observer2 = new MutationObserver(mutationRecords => {
+//   console.log(mutationRecords);
+//   // if (! document.querySelector(playlistDurText)) 
+//   //   containerToPlace.appendChild(createPlaylistDurElement());
+// });
+
+// observer2.observe(containerToPlace, {
+//   childList: true, 
+//   subtree: true, 
+// });  
+
+function createPlaylistDurElement(){
   var div = document.createElement('div');
   console.log(pSelectors);
   div.classList.add(playlistDur);
@@ -46,9 +86,9 @@ function createElement(){
   img.src = imgURL;
 
   var span = document.createElement('span');
-  span.innerHTML = gelAllPlaylist();
+  span.innerHTML = getPlaylistDuration();
   span.onclick = function (event){
-    span.innerHTML = gelAllPlaylist();
+    span.innerHTML = getPlaylistDuration();
   }
 
   div.appendChild(img);
@@ -56,43 +96,14 @@ function createElement(){
   return div;
 }
 
-function gelAllPlaylist(){
-  videosCollection = document.querySelectorAll(pSelectors.videoTime);
+
+
+function getPlaylistDuration(){
+  videosCollection = document.querySelectorAll(pSelectors.videoTimeSpan);
   timeSeconds = calcTotalDuration(videosCollection);
-  var moreButton = document.querySelector(pSelectors.loadMore);
-  if(moreButton){
-    getJSON(moreButton.dataset.uixLoadMoreHref);
-    var doc = parser.parseFromString(videosCollection, "text/html")
-    timeSeconds += calcTotalDuration(doc.querySelectorAll(pSelectors.videoTime));
-  } else{
-    return convertSeconds(timeSeconds, videosCollection.length);
-  }
-  return '--:--:--';
+  return convertSeconds(timeSeconds, videosCollection.length);
 }
 
-function getJSON(url) {
-  var url = 'https://www.youtube.com'+url;
-  var xhr = new XMLHttpRequest();
-  xhr.open("get", url, true);
-  xhr.responseType = "json";
-  xhr.onload = function() {
-    var status = xhr.status;
-    if (status == 200) {
-      var data = xhr.response;
-      var doc = parser.parseFromString(data.content_html, "text/html")
-      timeSeconds += calcTotalDuration(doc.querySelectorAll(pSelectors.videoTime));
-      if(data.load_more_widget_html){
-        var more = parser.parseFromString(data.load_more_widget_html, "text/html");
-        getJSON(more.querySelector(pSelectors.loadMore).dataset.uixLoadMoreHref);
-      } else {
-        document.querySelector(playlistDurText).innerHTML = convertSeconds(timeSeconds, videosCollection.length);
-      }
-    } else {
-      document.querySelector(playlistDurText).innerHTML = '--:--:--';
-    }
-  };
-  xhr.send(timeSeconds);
-};
 
 function calcTotalDuration(timeList){
   var time = [].slice.call(timeList).reduce(function(a, el){

@@ -15,6 +15,6 @@
    "manifest_version": 2,
    "name": "Общее время youtube плейлиста",
    "update_url": "https://clients2.google.com/service/update2/crx",
-   "version": "1.4",
+   "version": "1.5",
    "web_accessible_resources": [ "icon.svg" ]
 }
