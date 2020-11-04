@@ -24,56 +24,30 @@ var pSelectorsPolymer = {
 var playlistDur = 'playlistDur';
 var playlistDurText  = '.playlistDur span';
 
-var parser = new DOMParser();
 var newInterface = document.querySelector(pSelectorsPolymer.containerToPlace);
-
 var pSelectors;
 if (newInterface)
   pSelectors = pSelectorsPolymer
 else
   pSelectors = pSelectorsOld;
 
-var containerToPlace = document.querySelector(pSelectors.containerToPlace);  
-containerToPlace.appendChild(createPlaylistDurElement());
 
-
-var playlistConteiner = document.querySelector(pSelectors.playlistConteiner)
-
-let observer = new MutationObserver(mutationRecords => {
-  // console.log(mutationRecords);
-
-  for (const mutationRecord of mutationRecords) {
-    // console.log(mutationRecord.target);
-    // if (mutationRecord.removedNodes.length > 0)
-    //   console.log(mutationRecord.removedNodes[0].nodeName);
-
-    if (mutationRecord.type == "childList")
-    if (mutationRecord.target.matches(pSelectors.videoTime) 
-    ||
-      (
-        (mutationRecord.removedNodes.length > 0) && 
-        (mutationRecord.removedNodes[0].nodeName == pSelectors.videoConteiner.toUpperCase()))
-      )
-        document.querySelector(playlistDurText).innerHTML = getPlaylistDuration();
+var containerToPlace = document.querySelector(pSelectors.containerToPlace); 
+if (! containerToPlace) 
+  console.log('No container to place PlaylistDuration')
+else { 
+  var alreadyCreated = document.querySelector(playlistDurText);
+  if (! alreadyCreated) {
+    containerToPlace.appendChild(createPlaylistDurElement())
+    addObserver();
   }
-});
+  else {
+    console.log('PlaylistDuration updated instead of creating');
+    document.querySelector(playlistDurText).innerHTML = getPlaylistDuration();
+  }  
+}
 
-observer.observe(playlistConteiner, {
-  childList: true, 
-  subtree: true,
-  characterData: true
-});  
 
-// let observer2 = new MutationObserver(mutationRecords => {
-//   console.log(mutationRecords);
-//   // if (! document.querySelector(playlistDurText)) 
-//   //   containerToPlace.appendChild(createPlaylistDurElement());
-// });
-
-// observer2.observe(containerToPlace, {
-//   childList: true, 
-//   subtree: true, 
-// });  
 
 function createPlaylistDurElement(){
   var div = document.createElement('div');
@@ -86,7 +60,10 @@ function createPlaylistDurElement(){
   img.src = imgURL;
 
   var span = document.createElement('span');
+
+  console.log('PlaylistDuration calc on create');
   span.innerHTML = getPlaylistDuration();
+
   span.onclick = function (event){
     span.innerHTML = getPlaylistDuration();
   }
@@ -95,17 +72,78 @@ function createPlaylistDurElement(){
   div.appendChild(span);
   return div;
 }
+   
 
+
+function addObserver(){
+  let playlistConteiner = document.querySelector(pSelectors.playlistConteiner)
+  let timerUpdate;
+
+  let observer = new MutationObserver(mutationRecords => {
+    // console.log(mutationRecords);
+
+    for (const mutationRecord of mutationRecords) {
+      // console.log(mutationRecord.target);
+      // if (mutationRecord.removedNodes.length > 0)
+      //   console.log(mutationRecord.removedNodes[0].nodeName);
+
+      if (mutationRecord.type == "childList")
+      if (mutationRecord.target.matches(pSelectors.videoTime) 
+      ||
+        (
+          (mutationRecord.removedNodes.length > 0) && 
+          (mutationRecord.removedNodes[0].nodeName == pSelectors.videoConteiner.toUpperCase()))
+        )
+        {
+          console.log(Date.now() + ' PlaylistDuration updated on mutation');
+          document.querySelector(playlistDurText).innerHTML = getPlaylistDuration();
+
+          
+          clearTimeout(timerUpdate);
+          timerUpdate = setTimeout(updatePlaylistDuration, 1000);
+        }
+    }
+  });
+
+
+  observer.observe(playlistConteiner, {
+    childList: true, 
+    subtree: true,
+    characterData: true
+  });  
+
+
+  function updatePlaylistDuration() {
+    console.log(Date.now() + ' PlaylistDuration updated on mutation with delay');
+    document.querySelector(playlistDurText).innerHTML = getPlaylistDuration();
+  }
+  
+  // let observer2 = new MutationObserver(mutationRecords => {
+  //   console.log(mutationRecords);
+  //   // if (! document.querySelector(playlistDurText)) 
+  //   //   containerToPlace.appendChild(createPlaylistDurElement());
+  // });
+
+  // observer2.observe(containerToPlace, {
+  //   childList: true, 
+  //   subtree: true, 
+  // });  
+}
 
 
 function getPlaylistDuration(){
-  videosCollection = document.querySelectorAll(pSelectors.videoTimeSpan);
+  videosCollection = document.querySelectorAll(pSelectors.playlistConteiner + ' ' + pSelectors.videoTimeSpan);
   timeSeconds = calcTotalDuration(videosCollection);
   return convertSeconds(timeSeconds, videosCollection.length);
 }
 
 
 function calcTotalDuration(timeList){
+  // var allstr = [].slice.call(timeList).reduce(function(a, el){
+  //   return a + el.innerHTML.trim() + ', ';
+  // }, '')
+  // console.log(videosCollection.length + ': ' + allstr)
+
   var time = [].slice.call(timeList).reduce(function(a, el){
     return a + el.innerHTML.split(':').reverse().map(function(a,i){
       return [1,60,3600][i]*a;

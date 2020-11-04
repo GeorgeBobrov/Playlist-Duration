@@ -1,10 +1,20 @@
 {
+   "manifest_version": 2,
+   "name": "Playlist Duration for YouTube",
+   "description": "Shows the total duration of all videos on the playlist page",
+   "version": "1.6",
    "content_scripts": [ {
       "css": [ "PlaylistDuration.css" ],
       "js": [ "PlaylistDuration.js" ],
-      "matches": [ "https://www.youtube.com/playlist?list=*" ]
+      "matches": [ "https://www.youtube.com/*" ]
    } ],
-   "description": "Adds the total duration of all videos to the playlist page",
+   "background": {
+      "scripts": ["background.js"],
+      "persistent": false
+   },
+   "permissions": [
+      "*://www.youtube.com/*", "tabs", "webNavigation"
+   ],   
    "icons": {
       "128": "128x128.png",
       "16": "16x16.png",
@@ -12,9 +22,6 @@
       "48": "48x48.png"
    },
    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgfBLBTerShEamuP+StmL6JYYH0smmJGdnMWVHI7WvmQh9tCZzF34tYFnvYvDqhUsPIuqJG/zVQZt1U+OAm04l9cyODY1uByub1y+Idrt15x3CNzdm+PpJd+MqVI20C4US2w9d2QOL79Wa2ECMXpNxTFt3URco5/3w/u5Tq3O0LATsBWBQFlFhH4Z/eDD0WOpzPvpk0utcAIr3IoHP2nm35rISHKN9IVrtcpEbf90wNh5IhWU6l+FQ7qPt3GoMvphXZ+4roe01pfdG0GMdqq+N91o2eJpj0K/7xGtyavu0Rlo0lTVlgbn66lZllvYtdI1XKISQi9z2sxKlDc85tsD5wIDAQAB",
-   "manifest_version": 2,
-   "name": "Playlist Duration for YouTube - shows duration of all videos in playlist",
    "update_url": "https://clients2.google.com/service/update2/crx",
-   "version": "1.5",
    "web_accessible_resources": [ "icon.svg" ]
 }
