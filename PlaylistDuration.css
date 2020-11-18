@@ -20,17 +20,14 @@
 	width: 16px;
 	height: 16px;
 }
-.playlistDur img.playlistDur_load{
-	animation-name: circle;
-	animation-duration: 1s;
-	animation-iteration-count: infinite;
-}
-@keyframes circle{
-	0%{transform: rotate(0deg)}
-	100%{transform: rotate(360deg)}
-}
+
 .playlistDur img,
 .playlistDur span{
 	display: inline-block;
+	vertical-align: middle;
+}
+
+.playlistDur input{
+    margin: -3px 1px 0px 2px;
 	vertical-align: middle;
 }

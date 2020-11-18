@@ -2,7 +2,7 @@
    "manifest_version": 2,
    "name": "Playlist Duration for YouTube",
    "description": "Shows the total duration of all videos on the playlist page",
-   "version": "1.6",
+   "version": "1.7",
    "content_scripts": [ {
       "css": [ "PlaylistDuration.css" ],
       "js": [ "PlaylistDuration.js" ],
@@ -13,7 +13,7 @@
       "persistent": false
    },
    "permissions": [
-      "*://www.youtube.com/*", "tabs", "webNavigation"
+      "*://www.youtube.com/*", "tabs"
    ],   
    "icons": {
       "128": "128x128.png",

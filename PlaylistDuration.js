@@ -50,8 +50,8 @@ else {
 
 
 function createPlaylistDurElement(){
+  console.log('Create PlaylistDuration element');   
   var div = document.createElement('div');
-  console.log(pSelectors);
   div.classList.add(playlistDur);
   if (newInterface)  
    div.classList.add('polymer');
@@ -68,8 +68,23 @@ function createPlaylistDurElement(){
     span.innerHTML = getPlaylistDuration();
   }
 
+  var divShowIndeces = document.createElement('div');
+  divShowIndeces.style.marginTop = '10px';
+
+  var checkboxShowIndeces = document.createElement('input');
+  checkboxShowIndeces.type = 'checkbox';  
+  checkboxShowIndeces.id = 'checkboxShowIndeces';
+  checkboxShowIndeces.onclick = showIndeces;
+
+  var span2 = document.createElement('span');
+  span2.innerText = 'Show indeces';
+
+  divShowIndeces.appendChild(checkboxShowIndeces);
+  divShowIndeces.appendChild(span2);
+
   div.appendChild(img);
   div.appendChild(span);
+  div.appendChild(divShowIndeces);
   return div;
 }
    
@@ -137,6 +152,14 @@ function getPlaylistDuration(){
   return convertSeconds(timeSeconds, videosCollection.length);
 }
 
+function showIndeces(event) {
+  let checked = event.target.checked
+
+  let indeces = document.querySelectorAll('#index.ytd-playlist-video-renderer');
+  indeces.forEach(function(el){
+    el.style.display = checked ? 'unset' : 'none';
+  });
+}
 
 function calcTotalDuration(timeList){
   // var allstr = [].slice.call(timeList).reduce(function(a, el){
@@ -145,14 +168,18 @@ function calcTotalDuration(timeList){
   // console.log(videosCollection.length + ': ' + allstr)
 
   var time = [].slice.call(timeList).reduce(function(a, el){
-    return a + el.innerHTML.split(':').reverse().map(function(a,i){
-      return [1,60,3600][i]*a;
-    }).reduce(function(a,b){
-      return a+b;
-    });
+    return a + convertToSeconds(el.innerHTML);
   }, 0)
 
   return time;
+
+  function convertToSeconds(str) {
+    return str.split(':').reverse().map(function(a,i){
+      return [1,60,3600][i]*a;
+    }).reduce(function(a,b){
+      return a+b;
+    })
+  }
 }
 
 function convertSeconds(num, countOfVideos){
