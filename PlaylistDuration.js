@@ -12,7 +12,7 @@ var pSelectors = {
 
 var playlistDur = 'playlistDur';
 var playlistDurText  = '.playlistDur span';
-var idcheckboxShowIndeces = 'checkboxShowIndeces';
+var idcheckboxShowIndices = 'checkboxShowIndices';
 
 
 var containerToPlace = document.querySelector(pSelectors.containerToPlace); 
@@ -44,23 +44,23 @@ function createPlaylistDurElement(){
 	var span = document.createElement('span');
 	span.onclick = updatePlaylistDuration;
 
-	var divShowIndeces = document.createElement('div');
-	divShowIndeces.style.marginTop = '10px';
+	var divShowIndices = document.createElement('div');
+	divShowIndices.style.marginTop = '10px';
 
-	var checkboxShowIndeces = document.createElement('input');
-	checkboxShowIndeces.type = 'checkbox';  
-	checkboxShowIndeces.id = idcheckboxShowIndeces;
-	checkboxShowIndeces.onclick = showIndeces;
+	var checkboxShowIndices = document.createElement('input');
+	checkboxShowIndices.type = 'checkbox';  
+	checkboxShowIndices.id = idcheckboxShowIndices;
+	checkboxShowIndices.onclick = showIndices;
 
 	var span2 = document.createElement('span');
-	span2.innerText = 'Show indeces';
+	span2.innerText = 'Show indices';
 
-	divShowIndeces.appendChild(checkboxShowIndeces);
-	divShowIndeces.appendChild(span2);
+	divShowIndices.appendChild(checkboxShowIndices);
+	divShowIndices.appendChild(span2);
 
 	div.appendChild(img);
 	div.appendChild(span);
-	div.appendChild(divShowIndeces);
+	div.appendChild(divShowIndices);
 	return div;
 }
 	 
@@ -113,7 +113,7 @@ function addObserver(){
 
 function updatePlaylistDuration(){
 	document.querySelector(playlistDurText).innerHTML = getPlaylistDuration();
-	showIndeces();
+	showIndices();
 }  
 
 function getPlaylistDuration(){
@@ -122,11 +122,11 @@ function getPlaylistDuration(){
 	return convertSeconds(timeSeconds, videosCollection.length);
 }
 
-function showIndeces(event) {
-	let checked = document.getElementById(idcheckboxShowIndeces).checked
+function showIndices(event) {
+	let checked = document.getElementById(idcheckboxShowIndices).checked
 
-	let indeces = document.querySelectorAll(pSelectors.videoIndex);
-	indeces.forEach(function(el){
+	let indices = document.querySelectorAll(pSelectors.videoIndex);
+	indices.forEach(function(el){
 		el.style.display = checked ? 'unset' : 'none';
 	});
 }
