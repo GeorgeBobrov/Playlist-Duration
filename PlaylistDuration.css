@@ -1,15 +1,12 @@
 .playlistDur{
-	position: absolute;
+	position: unset;
 	right: 15px;
 	bottom: 10px;
-}
-
-.polymer{
-	position: unset;
 	left: 15px;
 	font-size: 12px;
 	padding-bottom: 10px;
 }
+
 
 .playlistDur span{
 	color: #767676;

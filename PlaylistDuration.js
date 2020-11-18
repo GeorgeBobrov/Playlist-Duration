@@ -3,17 +3,8 @@ var imgURL = chrome.extension.getURL("icon.svg");
 var videosCollection,
     timeSeconds;
 
-// Selectors for old interface
-var pSelectorsOld = {
-  containerToPlace: '#pl-header',
-  videoTime : 'tbody#pl-load-more-destination',
-  videoTimeSpan: '.timestamp > span',  
-  playlistConteiner: '#browse-items-primary',
-  videoConteiner: 'TR'
-}
-
-// Selectors for new (Polymer) interface
-var pSelectorsPolymer = {
+// Selectors for Polymer interface
+var pSelectors = {
   containerToPlace: '#items > ytd-playlist-sidebar-primary-info-renderer',
   videoTime : 'ytd-thumbnail-overlay-time-status-renderer',
   videoTimeSpan: 'ytd-thumbnail-overlay-time-status-renderer > span',
@@ -23,13 +14,6 @@ var pSelectorsPolymer = {
 
 var playlistDur = 'playlistDur';
 var playlistDurText  = '.playlistDur span';
-
-var newInterface = document.querySelector(pSelectorsPolymer.containerToPlace);
-var pSelectors;
-if (newInterface)
-  pSelectors = pSelectorsPolymer
-else
-  pSelectors = pSelectorsOld;
 
 
 var containerToPlace = document.querySelector(pSelectors.containerToPlace); 
@@ -48,13 +32,10 @@ else {
 }
 
 
-
 function createPlaylistDurElement(){
   console.log('Create PlaylistDuration element');   
   var div = document.createElement('div');
   div.classList.add(playlistDur);
-  if (newInterface)  
-   div.classList.add('polymer');
 
   var img = document.createElement('img');
   img.src = imgURL;
