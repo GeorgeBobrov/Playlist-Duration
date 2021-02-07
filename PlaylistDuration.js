@@ -50,6 +50,7 @@ function createPlaylistDurElement(){
 	var checkboxShowIndices = document.createElement('input');
 	checkboxShowIndices.type = 'checkbox';  
 	checkboxShowIndices.id = idcheckboxShowIndices;
+	checkboxShowIndices.checked = true;
 	checkboxShowIndices.onclick = showIndices;
 
 	var span2 = document.createElement('span');
