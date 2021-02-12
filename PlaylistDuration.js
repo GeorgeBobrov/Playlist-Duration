@@ -16,11 +16,11 @@ var idcheckboxShowIndices = 'checkboxShowIndices';
 
 
 var containerToPlace = document.querySelector(pSelectors.containerToPlace); 
-if (! containerToPlace) 
+if (!containerToPlace) 
 	console.log('No container to place PlaylistDuration')
 else { 
-	var alreadyCreated = document.querySelector(playlistDurText);
-	if (! alreadyCreated) {
+	let alreadyCreated = document.querySelector(playlistDurText);
+	if (!alreadyCreated) {
 		containerToPlace.appendChild(createPlaylistDurElement())
 		addObserver();
 		console.log('PlaylistDuration calc on create');
@@ -35,25 +35,25 @@ else {
 
 function createPlaylistDurElement(){
 	console.log('Create PlaylistDuration element');   
-	var div = document.createElement('div');
+	let div = document.createElement('div');
 	div.classList.add(playlistDur);
 
-	var img = document.createElement('img');
+	let img = document.createElement('img');
 	img.src = imgURL;
 
-	var span = document.createElement('span');
+	let span = document.createElement('span');
 	span.onclick = updatePlaylistDuration;
 
-	var divShowIndices = document.createElement('div');
+	let divShowIndices = document.createElement('div');
 	divShowIndices.style.marginTop = '10px';
 
-	var checkboxShowIndices = document.createElement('input');
+	let checkboxShowIndices = document.createElement('input');
 	checkboxShowIndices.type = 'checkbox';  
 	checkboxShowIndices.id = idcheckboxShowIndices;
 	checkboxShowIndices.checked = true;
 	checkboxShowIndices.onclick = showIndices;
 
-	var span2 = document.createElement('span');
+	let span2 = document.createElement('span');
 	span2.innerText = 'Show indices';
 
 	divShowIndices.appendChild(checkboxShowIndices);
@@ -80,20 +80,18 @@ function addObserver(){
 			//   console.log(mutationRecord.removedNodes[0].nodeName);
 
 			if (mutationRecord.type == "childList")
+			//if time labels were loaded (they are loaded gradually and asynchronously)
 			if (mutationRecord.target.matches(pSelectors.videoTime) 
-			||
-				(
-					(mutationRecord.removedNodes.length > 0) && 
-					(mutationRecord.removedNodes[0].nodeName == pSelectors.videoConteiner.toUpperCase()))
-				)
-				{
-					console.log(Date.now() + ' PlaylistDuration updated on mutation');
-					updatePlaylistDuration();
+			//or removed videos in the playlist
+				|| ((mutationRecord.removedNodes.length > 0) && 
+					(mutationRecord.removedNodes[0].nodeName == pSelectors.videoConteiner.toUpperCase())))
+			{
+				console.log(Date.now() + ' PlaylistDuration updated on mutation');
+				updatePlaylistDuration();
 
-					
-					clearTimeout(timerUpdate);
-					timerUpdate = setTimeout(updatePlaylistDurationDelayed, 1000);
-				}
+				clearTimeout(timerUpdate);
+				timerUpdate = setTimeout(updatePlaylistDurationDelayed, 1000);
+			}
 		}
 	});
 
@@ -133,12 +131,12 @@ function showIndices(event) {
 }
 
 function calcTotalDuration(timeList){
-	// var allstr = [].slice.call(timeList).reduce(function(a, el){
+	// let allstr = [].slice.call(timeList).reduce(function(a, el){
 	//   return a + el.innerHTML.trim() + ', ';
 	// }, '')
 	// console.log(videosCollection.length + ': ' + allstr)
 
-	var time = [].slice.call(timeList).reduce(function(a, el){
+	let time = [].slice.call(timeList).reduce(function(a, el){
 		return a + convertToSeconds(el.innerHTML);
 	}, 0)
 
