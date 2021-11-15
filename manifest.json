@@ -2,11 +2,11 @@
    "manifest_version": 2,
    "name": "Playlist Duration for YouTube",
    "description": "Shows the total duration of all videos on the playlist page",
-   "version": "1.7.2",
+   "version": "1.7.3",
    "content_scripts": [ {
       "css": [ "PlaylistDuration.css" ],
       "js": [ "PlaylistDuration.js" ],
-      "matches": [ "https://www.youtube.com/*" ]
+      "matches": [ "https://www.youtube.com/playlist*" ]
    } ],
    "background": {
       "scripts": ["background.js"],

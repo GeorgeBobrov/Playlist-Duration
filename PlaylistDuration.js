@@ -1,9 +1,10 @@
+/*global chrome*/
 var imgURL = chrome.extension.getURL("icon.svg");
 
 // Selectors for Polymer interface
 var pSelectors = {
 	containerToPlace: '#items > ytd-playlist-sidebar-primary-info-renderer',
-	videoTime : 'ytd-thumbnail-overlay-time-status-renderer',
+	videoTime: 'ytd-thumbnail-overlay-time-status-renderer',
 	videoTimeSpan: 'ytd-thumbnail-overlay-time-status-renderer > span',
 	playlistConteiner: 'ytd-playlist-video-list-renderer',
 	videoConteiner: 'ytd-playlist-video-renderer',
@@ -11,17 +12,17 @@ var pSelectors = {
 }
 
 var playlistDur = 'playlistDur';
-var playlistDurText  = '.playlistDur span';
+var playlistDurText = '.playlistDur span';
 var idcheckboxShowIndices = 'checkboxShowIndices';
 
 
-var containerToPlace = document.querySelector(pSelectors.containerToPlace); 
-if (!containerToPlace) 
+var containerToPlace = document.querySelector(pSelectors.containerToPlace);
+if (!containerToPlace)
 	console.log('No container to place PlaylistDuration')
-else { 
+else {
 	let alreadyCreated = document.querySelector(playlistDurText);
 	if (!alreadyCreated) {
-		containerToPlace.appendChild(createPlaylistDurElement())
+		containerToPlace.appendChild(createPlaylistDurElement());
 		addObserver();
 		console.log('PlaylistDuration calc on create');
 	}
@@ -33,8 +34,8 @@ else {
 }
 
 
-function createPlaylistDurElement(){
-	console.log('Create PlaylistDuration element');   
+function createPlaylistDurElement() {
+	console.log('Create PlaylistDuration element');
 	let div = document.createElement('div');
 	div.classList.add(playlistDur);
 
@@ -48,7 +49,7 @@ function createPlaylistDurElement(){
 	divShowIndices.style.marginTop = '10px';
 
 	let checkboxShowIndices = document.createElement('input');
-	checkboxShowIndices.type = 'checkbox';  
+	checkboxShowIndices.type = 'checkbox';
 	checkboxShowIndices.id = idcheckboxShowIndices;
 	checkboxShowIndices.checked = true;
 	checkboxShowIndices.onclick = showIndices;
@@ -64,10 +65,10 @@ function createPlaylistDurElement(){
 	div.appendChild(divShowIndices);
 	return div;
 }
-	 
 
 
-function addObserver(){
+
+function addObserver() {
 	let playlistConteiner = document.querySelector(pSelectors.playlistConteiner)
 	let timerUpdate;
 
@@ -81,12 +82,12 @@ function addObserver(){
 
 			if (mutationRecord.type == "childList")
 			//if time labels were loaded (they are loaded gradually and asynchronously)
-			if (mutationRecord.target.matches(pSelectors.videoTime) 
+			if (mutationRecord.target.matches(pSelectors.videoTime)
 			//or removed videos in the playlist
-				|| ((mutationRecord.removedNodes.length > 0) && 
+				|| ((mutationRecord.removedNodes.length > 0) &&
 					(mutationRecord.removedNodes[0].nodeName == pSelectors.videoConteiner.toUpperCase())))
 			{
-				console.log(Date.now() + ' PlaylistDuration updated on mutation');
+				console.log(new Date().toISOString() + ' PlaylistDuration updated on mutation');
 				updatePlaylistDuration();
 
 				clearTimeout(timerUpdate);
@@ -97,70 +98,71 @@ function addObserver(){
 
 
 	observer.observe(playlistConteiner, {
-		childList: true, 
+		childList: true,
 		subtree: true,
 		characterData: true
-	});  
+	});
 
 
 	function updatePlaylistDurationDelayed() {
-		console.log(Date.now() + ' PlaylistDuration updated on mutation with delay');
+		console.log(new Date().toISOString() + ' PlaylistDuration updated on mutation with delay');
 		updatePlaylistDuration();
 	}
-	
+
 }
 
 function updatePlaylistDuration(){
-	document.querySelector(playlistDurText).innerHTML = getPlaylistDuration();
-	showIndices();
-}  
-
-function getPlaylistDuration(){
 	let videosCollection = document.querySelectorAll(pSelectors.playlistConteiner + ' ' + pSelectors.videoTimeSpan);
 	let timeSeconds = calcTotalDuration(videosCollection);
-	return convertSeconds(timeSeconds, videosCollection.length);
+	let formattedDurationStr = secondsToTimeStr(timeSeconds);
+
+	document.querySelector(playlistDurText).innerHTML =
+		`Duration of ${videosCollection.length}: &nbsp;&nbsp; ${formattedDurationStr}`;
+
+	showIndices();
 }
+
 
 function showIndices(event) {
 	let checked = document.getElementById(idcheckboxShowIndices).checked
 
 	let indices = document.querySelectorAll(pSelectors.videoIndex);
 	indices.forEach(function(el){
-		el.style.display = checked ? 'unset' : 'none';
+		el.style.display = checked ? 'block' : 'none';
 	});
 }
 
-function calcTotalDuration(timeList){
+function calcTotalDuration(timeList) {
 	// let allstr = [].slice.call(timeList).reduce(function(a, el){
 	//   return a + el.innerHTML.trim() + ', ';
 	// }, '')
 	// console.log(videosCollection.length + ': ' + allstr)
 
-	let time = [].slice.call(timeList).reduce(function(a, el){
-		return a + convertToSeconds(el.innerHTML);
+	let time = [].slice.call(timeList).reduce(function(sum, el){
+		return sum + timeStrToSeconds(el.innerHTML);
 	}, 0)
 
 	return time;
 
-	function convertToSeconds(str) {
-		return str.split(':').reverse().map(function(a,i){
-			return [1,60,3600][i]*a;
-		}).reduce(function(a,b){
-			return a+b;
+	function timeStrToSeconds(str) {
+		return str.split(':').reverse().map(function(part, i){
+			return [1, 60, 3600][i] * part;
+		}).reduce(function(sum, v){
+			return sum + v;
 		})
 	}
 }
 
-function convertSeconds(num, countOfVideos){
+function secondsToTimeStr(num) {
 	let sec = num % 60;
 	num = Math.trunc(num / 60);
 	let min = num % 60;
 	num = Math.trunc(num / 60);
 	let hour = num % 24;
-	let day = Math.trunc(num / 24); 
+	let day = Math.trunc(num / 24);
 
-	let result = 'Duration of ' + countOfVideos + ': &nbsp;&nbsp;';
-	if (day > 0) 
+	let result = '';
+	if (day > 0)
 		result = result + day + 'd ';
 	if ((day > 0) || (hour > 0))
 		result = result + hour + 'h ';
