@@ -15,22 +15,32 @@ var playlistDur = 'playlistDur';
 var playlistDurText = '.playlistDur span';
 var idcheckboxShowIndices = 'checkboxShowIndices';
 
+checkCreatePlaylistDur()
 
-var containerToPlace = document.querySelector(pSelectors.containerToPlace);
-if (!containerToPlace)
-	console.log('No container to place PlaylistDuration')
-else {
-	let alreadyCreated = document.querySelector(playlistDurText);
-	if (!alreadyCreated) {
-		containerToPlace.appendChild(createPlaylistDurElement());
-		addObserver();
-		console.log('PlaylistDuration calc on create');
-	}
-	else {
-		console.log('PlaylistDuration updated instead of creating');
-	}
+document.addEventListener("yt-navigate-finish", function(event) {
+	// console.log("yt-navigate-finish from PlaylistDuration")
+	checkCreatePlaylistDur()
+})
 
-	updatePlaylistDuration();
+function checkCreatePlaylistDur() {
+	if (location.pathname == "/playlist") {
+		var containerToPlace = document.querySelector(pSelectors.containerToPlace);
+		if (!containerToPlace)
+			console.log('No container to place PlaylistDuration')
+		else {
+			let alreadyCreated = document.querySelector(playlistDurText);
+			if (!alreadyCreated) {
+				containerToPlace.appendChild(createPlaylistDurElement());
+				addObserver();
+				console.log('PlaylistDuration calc on create');
+			}
+			else {
+				console.log('PlaylistDuration updated instead of creating');
+			}
+
+			updatePlaylistDuration();
+		}
+	}
 }
 
 
@@ -87,7 +97,7 @@ function addObserver() {
 				|| ((mutationRecord.removedNodes.length > 0) &&
 					(mutationRecord.removedNodes[0].nodeName == pSelectors.videoConteiner.toUpperCase())))
 			{
-				console.log(new Date().toISOString() + ' PlaylistDuration updated on mutation');
+				// console.log(new Date().toISOString() + ' PlaylistDuration updated on mutation');
 				updatePlaylistDuration();
 
 				clearTimeout(timerUpdate);

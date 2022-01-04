@@ -18,7 +18,7 @@
         }],
         "no-multi-spaces": ["warn", { "ignoreEOLComments": true }],
         "no-trailing-spaces": ["warn", { "ignoreComments": true }],
-        "comma-spacing": ["warn", { "before": false, "after": true }],
-        "eqeqeq": ["warn", "smart"]
+        "comma-spacing": ["warn", { "before": false, "after": true }]
+        // "eqeqeq": ["warn", "smart"]
     }
 }
