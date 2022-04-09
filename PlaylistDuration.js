@@ -47,19 +47,24 @@ function checkCreatePlaylistDur() {
 
 function createPlaylistDurElement(parent) {
 	let html = /*html*/`<div class=${playlistDur}>
-	<img src=${imgURL}>
+		<img src=${imgURL}>
 		<span></span>
 		<div style="margin-top: 10px;">
 			<input type="checkbox" id=${idcbShowIndices} checked">
 			<label for=${idcbShowIndices}>Show indices</label>
 		</div>
+		<button style="margin-top: 10px;">Export playlist</button> 
 	</div>`
 	parent.insertAdjacentHTML('beforeend', html);
-	parent.querySelector('span').onclick = updatePlaylistDuration;
+	let createdElement = parent.lastChild;
 
-	let cbShowIndices = parent.querySelector('input');
+	createdElement.querySelector('span').onclick = updatePlaylistDuration;
+
+	let cbShowIndices = createdElement.querySelector('input');
 	cbShowIndices.onclick = showIndices;
 	cbShowIndices.checked = true;
+
+	createdElement.querySelector('button').onclick = exportPlaylist;
 }
 
 
@@ -78,17 +83,17 @@ function addObserver() {
 
 			if (mutationRecord.type == "childList")
 			//if time labels were loaded (they are loaded gradually and asynchronously)
-			if (mutationRecord.target.matches(pSelectors.videoTime)
-			//or removed videos in the playlist
+				if (mutationRecord.target.matches(pSelectors.videoTime)
+				//or removed videos in the playlist
 				|| ((mutationRecord.removedNodes.length > 0) &&
 					(mutationRecord.removedNodes[0].nodeName == pSelectors.videoConteiner.toUpperCase())))
-			{
+				{
 				// console.log(new Date().toISOString() + ' PlaylistDuration updated on mutation');
-				updatePlaylistDuration();
+					updatePlaylistDuration();
 
-				clearTimeout(timerUpdate);
-				timerUpdate = setTimeout(updatePlaylistDurationDelayed, 1000);
-			}
+					clearTimeout(timerUpdate);
+					timerUpdate = setTimeout(updatePlaylistDurationDelayed, 1000);
+				}
 		}
 	});
 
@@ -166,4 +171,35 @@ function secondsToTimeStr(num) {
 		String(sec).padStart(2, '0') + 's';
 
 	return result
+}
+
+async function exportPlaylist() {
+	let videosCollection = document.querySelectorAll(pSelectors.playlistConteiner + ' ' + pSelectors.videoConteiner);
+
+	let tableArr = [];
+
+	[...videosCollection].forEach((el, i) => {
+		let videoTitle = el.querySelector("#video-title")
+		let videoChannelName = el.querySelector("#channel-name a")
+
+		let videoInfo = {}
+		videoInfo.title = videoTitle?.title
+		videoInfo.link = videoTitle?.href
+		videoInfo.channel = videoChannelName?.textContent
+		videoInfo.channel_link = videoChannelName?.href
+
+		tableArr.push(videoInfo)
+
+	})
+	// console.table(tableArr);
+
+	let playlistTitleEl = document.querySelector("#title > yt-formatted-string > a") ??
+		document.querySelector("#text-displayed")
+	let playlistTitle = playlistTitleEl?.textContent;
+
+	let blob = new Blob([JSON.stringify(tableArr, null, 4)], {type: "text/plain"});
+	let fileHandle = await window.showSaveFilePicker({suggestedName:`Playlist ${playlistTitle}.json`, types: [{accept: {'text/plain': ['.json']}}]})
+	let fileStream = await fileHandle.createWritable();
+	await fileStream.write(blob);
+	await fileStream.close();
 }
