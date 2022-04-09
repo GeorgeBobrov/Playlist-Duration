@@ -13,7 +13,8 @@ var pSelectors = {
 
 var playlistDur = 'playlistDur';
 var playlistDurText = '.playlistDur span';
-var idcheckboxShowIndices = 'checkboxShowIndices';
+var idcbShowIndices = 'cbShowIndices';
+
 
 checkCreatePlaylistDur()
 
@@ -30,7 +31,7 @@ function checkCreatePlaylistDur() {
 		else {
 			let alreadyCreated = document.querySelector(playlistDurText);
 			if (!alreadyCreated) {
-				containerToPlace.appendChild(createPlaylistDurElement());
+				createPlaylistDurElement(containerToPlace)
 				addObserver();
 				console.log('PlaylistDuration calc on create');
 			}
@@ -44,36 +45,21 @@ function checkCreatePlaylistDur() {
 }
 
 
-function createPlaylistDurElement() {
-	console.log('Create PlaylistDuration element');
-	let div = document.createElement('div');
-	div.classList.add(playlistDur);
+function createPlaylistDurElement(parent) {
+	let html = /*html*/`<div class=${playlistDur}>
+	<img src=${imgURL}>
+		<span></span>
+		<div style="margin-top: 10px;">
+			<input type="checkbox" id=${idcbShowIndices} checked">
+			<label for=${idcbShowIndices}>Show indices</label>
+		</div>
+	</div>`
+	parent.insertAdjacentHTML('beforeend', html);
+	parent.querySelector('span').onclick = updatePlaylistDuration;
 
-	let img = document.createElement('img');
-	img.src = imgURL;
-
-	let span = document.createElement('span');
-	span.onclick = updatePlaylistDuration;
-
-	let divShowIndices = document.createElement('div');
-	divShowIndices.style.marginTop = '10px';
-
-	let checkboxShowIndices = document.createElement('input');
-	checkboxShowIndices.type = 'checkbox';
-	checkboxShowIndices.id = idcheckboxShowIndices;
-	checkboxShowIndices.checked = true;
-	checkboxShowIndices.onclick = showIndices;
-
-	let span2 = document.createElement('span');
-	span2.innerText = 'Show indices';
-
-	divShowIndices.appendChild(checkboxShowIndices);
-	divShowIndices.appendChild(span2);
-
-	div.appendChild(img);
-	div.appendChild(span);
-	div.appendChild(divShowIndices);
-	return div;
+	let cbShowIndices = parent.querySelector('input');
+	cbShowIndices.onclick = showIndices;
+	cbShowIndices.checked = true;
 }
 
 
@@ -134,7 +120,7 @@ function updatePlaylistDuration(){
 
 
 function showIndices(event) {
-	let checked = document.getElementById(idcheckboxShowIndices).checked
+	let checked = document.getElementById(idcbShowIndices).checked
 
 	let indices = document.querySelectorAll(pSelectors.videoIndex);
 	indices.forEach(function(el){

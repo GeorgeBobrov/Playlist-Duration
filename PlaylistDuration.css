@@ -8,7 +8,8 @@
 }
 
 
-.playlistDur span{
+.playlistDur span,
+.playlistDur label{
 	color: #767676;
 	margin-left: 5px;
 }
