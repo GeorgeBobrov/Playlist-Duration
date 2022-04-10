@@ -197,7 +197,7 @@ async function exportPlaylist() {
 		document.querySelector("#text-displayed")
 	let playlistTitle = playlistTitleEl?.textContent;
 
-	let blob = new Blob([JSON.stringify(tableArr, null, 4)], {type: "text/plain"});
+	let blob = new Blob([JSON.stringify(tableArr, null, '	')], {type: "text/plain"});
 	let fileHandle = await window.showSaveFilePicker({suggestedName:`Playlist ${playlistTitle}.json`, types: [{accept: {'text/plain': ['.json']}}]})
 	let fileStream = await fileHandle.createWritable();
 	await fileStream.write(blob);
