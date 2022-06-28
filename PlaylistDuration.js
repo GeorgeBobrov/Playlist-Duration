@@ -182,14 +182,14 @@ async function exportPlaylist() {
 		let videoTitle = el.querySelector("#video-title")
 		let videoChannelName = el.querySelector("#channel-name a")
 
-		let videoInfo = {}
-		videoInfo.title = videoTitle?.title
-		videoInfo.link = videoTitle?.href
-		videoInfo.channel = videoChannelName?.textContent
-		videoInfo.channel_link = videoChannelName?.href
+		let videoInfo = {
+			title: videoTitle?.title,
+			link: videoTitle?.href,
+			channel: videoChannelName?.textContent,
+			channel_link: videoChannelName?.href
+		}
 
 		tableArr.push(videoInfo)
-
 	})
 	// console.table(tableArr);
 
