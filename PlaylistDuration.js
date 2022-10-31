@@ -3,7 +3,7 @@ var imgURL = chrome.extension.getURL("icon.svg");
 
 // Selectors for Polymer interface
 var pSelectors = {
-	containerToPlace: '#items > ytd-playlist-sidebar-primary-info-renderer',
+	containerToPlace: 'ytd-playlist-header-renderer div.immersive-header-content.ytd-playlist-header-renderer',
 	videoTime: 'ytd-thumbnail-overlay-time-status-renderer',
 	videoTimeSpan: 'ytd-thumbnail-overlay-time-status-renderer > span',
 	playlistConteiner: 'ytd-playlist-video-list-renderer',
