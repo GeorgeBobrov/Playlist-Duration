@@ -5,7 +5,7 @@ var imgURL = chrome.extension.getURL("icon.svg");
 var pSelectors = {
 	containerToPlace: 'ytd-playlist-header-renderer div.immersive-header-content.ytd-playlist-header-renderer',
 	videoTime: 'ytd-thumbnail-overlay-time-status-renderer',
-	videoTimeSpan: 'ytd-thumbnail-overlay-time-status-renderer > span',
+	videoTimeSpan: 'ytd-thumbnail-overlay-time-status-renderer span',
 	playlistConteiner: 'ytd-playlist-video-list-renderer',
 	videoConteiner: 'ytd-playlist-video-renderer',
 	videoIndex: '#index.ytd-playlist-video-renderer'
@@ -193,8 +193,7 @@ async function exportPlaylist() {
 	})
 	// console.table(tableArr);
 
-	let playlistTitleEl = document.querySelector("#title > yt-formatted-string > a") ??
-		document.querySelector("#text-displayed")
+	let playlistTitleEl = document.querySelector("ytd-playlist-header-renderer #container #text")
 	let playlistTitle = playlistTitleEl?.textContent;
 
 	let blob = new Blob([JSON.stringify(tableArr, null, '	')], {type: "text/plain"});
